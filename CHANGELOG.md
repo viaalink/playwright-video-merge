@@ -14,6 +14,7 @@
 
 ### Other
 
+- **package:** homepage is https://viaalink.com.
 - First release through npm trusted publishing (GitHub Actions, `release.yml`).
 
 ## [0.2.0](https://github.com/viaalink/playwright-video-merge/compare/v0.1.0...v0.2.0) (2026-11-04)

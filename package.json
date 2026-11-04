@@ -65,7 +65,7 @@
   "bugs": {
     "url": "https://github.com/viaalink/playwright-video-merge/issues"
   },
-  "homepage": "https://github.com/viaalink/playwright-video-merge#readme",
+  "homepage": "https://viaalink.com",
   "dependencies": {
     "commander": "^13.1.0"
   },

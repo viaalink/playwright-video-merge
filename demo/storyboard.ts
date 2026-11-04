@@ -29,7 +29,7 @@ async function openTerminal(page: Page): Promise<void> {
   await page.goto(terminalState().url);
   await page.addStyleTag({
     content: `html, body { background: #0d1117 !important; }
-      body { box-sizing: border-box; padding: 64px 48px 96px !important; height: 100vh; }
+      body { box-sizing: border-box; padding: 84px 48px 136px !important; height: 100vh; }
       #terminal-container { height: 100% !important; width: 100% !important; }`,
   });
   // ttyd fits the terminal to its container on resize.

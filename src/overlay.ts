@@ -46,7 +46,7 @@ export function addOverlay(
 
   return new Promise((resolve, reject) => {
     ffmpeg(inputPath)
-      .videoFilters({ filter: 'drawtext', options: filterOpts })
+      .videoFilters([{ filter: 'drawtext', options: filterOpts }])
       .on('end', () => resolve(outputPath))
       .on('error', (err: Error) => reject(new Error(`Overlay failed for "${displayName}": ${err.message}`)))
       .save(outputPath);

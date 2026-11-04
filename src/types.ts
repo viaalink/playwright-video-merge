@@ -41,18 +41,33 @@ export interface MergeResult {
 }
 
 export interface FoundVideo {
-  /** Absolute path to the video.webm file */
+  /** Absolute path to the .webm file */
   path: string;
   /** Display name derived from folder or report */
   displayName: string;
   /** Modification time (for mtime sorting) */
   mtime: Date;
+  /** Part number when one test folder holds several recordings (1-based) */
+  part?: number;
+  /** Number of recordings in this video's test folder, when more than one */
+  partCount?: number;
+  /** Position of the matching test in the report (for report-order sorting) */
+  reportIndex?: number;
 }
 
 export interface ReportTest {
   id: string;
   file: string;
+  /** Describe blocks and test title, joined with " > " (the file name is left out) */
   fullTitle: string;
-  /** Folder name that Playwright creates for this test's artifacts */
+  titlePath?: string[];
+  projectName?: string;
+  /** Simplified folder name, used only when the report has no video attachment */
   folderName?: string;
+  /** Folder names of this test's video attachments (one per run/retry) */
+  videoFolders?: string[];
+  line?: number;
+  column?: number;
+  /** Position in the report, in file and declaration order */
+  order?: number;
 }

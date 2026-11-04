@@ -8,7 +8,7 @@ describe('findVideos', () => {
   it('should find all video.webm files in fixture directory', async () => {
     const videos = await findVideos(FIXTURES);
     expect(videos).toHaveLength(3);
-    expect(videos.every(v => v.path.endsWith('video.webm'))).toBe(true);
+    expect(videos.every(v => v.path.endsWith('.webm'))).toBe(true);
   });
 
   it('should extract display names from folder names', async () => {

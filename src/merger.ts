@@ -27,21 +27,36 @@ function emit(opts: MergeOptions, event: ProgressEvent): void {
   opts.onProgress?.(event);
 }
 
-function sortVideos(videos: FoundVideo[], strategy: string): FoundVideo[] {
+function byNameThenPart(a: FoundVideo, b: FoundVideo): number {
+  return a.displayName.localeCompare(b.displayName) || (a.part ?? 0) - (b.part ?? 0);
+}
+
+export function sortVideos(videos: FoundVideo[], strategy: string): FoundVideo[] {
   const sorted = [...videos];
   switch (strategy) {
     case 'mtime':
-      sorted.sort((a, b) => a.mtime.getTime() - b.mtime.getTime());
+      sorted.sort((a, b) => a.mtime.getTime() - b.mtime.getTime() || (a.part ?? 0) - (b.part ?? 0));
       break;
     case 'report-order':
-      // Already in report order if enriched; otherwise alphabetical fallback
+      // Tests in report order (file, then declaration order); videos the report
+      // does not know about come last, alphabetically.
+      sorted.sort((a, b) => {
+        const ia = a.reportIndex ?? Number.MAX_SAFE_INTEGER;
+        const ib = b.reportIndex ?? Number.MAX_SAFE_INTEGER;
+        return ia - ib || byNameThenPart(a, b);
+      });
       break;
     case 'alphabetical':
     default:
-      sorted.sort((a, b) => a.displayName.localeCompare(b.displayName));
+      sorted.sort(byNameThenPart);
       break;
   }
   return sorted;
+}
+
+/** The overlay text: the test name, plus "(1/2)" when the test recorded several videos. */
+export function overlayLabel(video: FoundVideo): string {
+  return video.partCount ? `${video.displayName} (${video.part}/${video.partCount})` : video.displayName;
 }
 
 function mergeVideoFiles(inputPaths: string[], outputPath: string, format: string): Promise<void> {
@@ -75,7 +90,7 @@ export async function merge(userOptions: MergeOptions = {}): Promise<MergeResult
   let videos = await findVideos(inputDir);
 
   if (videos.length === 0) {
-    throw new Error(`No video.webm files found in ${inputDir}`);
+    throw new Error(`No .webm videos found in ${inputDir}`);
   }
 
   // Enrich with report data if available
@@ -83,8 +98,12 @@ export async function merge(userOptions: MergeOptions = {}): Promise<MergeResult
     try {
       const reportTests = await parseReport(resolvePath(opts.reportPath));
       videos = enrichVideosWithReport(videos, reportTests);
-    } catch {
+    } catch (err) {
       // Report parsing failed — continue with folder names
+      emit(opts, {
+        stage: 'finding',
+        message: `Could not read report ${opts.reportPath} (${err instanceof Error ? err.message : err}); using folder names`,
+      });
     }
   }
 
@@ -107,10 +126,10 @@ export async function merge(userOptions: MergeOptions = {}): Promise<MergeResult
         stage: 'overlaying',
         current: i + 1,
         total: videos.length,
-        message: `Adding overlay ${i + 1}/${videos.length}: ${video.displayName}`,
+        message: `Adding overlay ${i + 1}/${videos.length}: ${overlayLabel(video)}`,
       });
 
-      const processedPath = await addOverlay(video.path, video.displayName, opts);
+      const processedPath = await addOverlay(video.path, overlayLabel(video), opts);
       processedPaths.push(processedPath);
       tempFiles.push(processedPath);
     }

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Acme Support</title>
+<link rel="stylesheet" href="style.css">
+<header><h1>Acme Support</h1><span id="who"></span></header>
+<main>
+  <ul><li><b>Acme</b> Hi! How can we help?</li></ul>
+  <input aria-label="Message" placeholder="Type a message and press Enter">
+</main>
+<script>
+  const who = new URLSearchParams(location.search).get('as') ?? 'Guest';
+  document.getElementById('who').textContent = `Signed in as ${who}`;
+  const input = document.querySelector('input');
+  input.focus();
+  input.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' || !input.value) return;
+    const li = document.createElement('li');
+    li.innerHTML = `<b>${who}</b> `;
+    li.append(input.value);
+    document.querySelector('ul').append(li);
+    input.value = '';
+  });
+</script>
+</html>

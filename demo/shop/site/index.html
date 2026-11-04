@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Acme Shop</title>
+<link rel="stylesheet" href="style.css">
+<header><h1>Acme Shop</h1><a href="#cart" data-testid="cart">Cart (0)</a></header>
+<main id="shop">
+  <input type="search" placeholder="Search products" aria-label="Search">
+  <div class="grid">
+    <article data-name="Desk lamp"><div class="pic" style="background:#ffcf6e"></div><h2>Desk lamp</h2><p>€ 39</p><button aria-label="Add Desk lamp">Add to cart</button></article>
+    <article data-name="Notebook"><div class="pic" style="background:#8fc1b5"></div><h2>Notebook</h2><p>€ 12</p><button aria-label="Add Notebook">Add to cart</button></article>
+    <article data-name="Mug"><div class="pic" style="background:#e2603a"></div><h2>Mug</h2><p>€ 9</p><button aria-label="Add Mug">Add to cart</button></article>
+  </div>
+</main>
+<main id="cart" class="hidden">
+  <h2>Checkout</h2>
+  <p id="items"></p>
+  <label>Card number <input autocomplete="off"></label>
+  <p><button>Pay</button></p>
+</main>
+<script>
+  const cart = [];
+  const link = document.querySelector('[data-testid=cart]');
+  document.querySelectorAll('article button').forEach((b) =>
+    b.addEventListener('click', () => {
+      cart.push(b.closest('article').dataset.name);
+      link.textContent = `Cart (${cart.length})`;
+    }));
+  document.querySelector('input[type=search]').addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase();
+    document.querySelectorAll('article').forEach((a) => a.classList.toggle('hidden', !a.dataset.name.toLowerCase().includes(q)));
+  });
+  link.addEventListener('click', () => {
+    document.getElementById('shop').classList.add('hidden');
+    document.getElementById('cart').classList.remove('hidden');
+    document.getElementById('items').textContent = cart.join(', ');
+  });
+  document.querySelector('#cart button').addEventListener('click', () => {
+    document.getElementById('cart').innerHTML = '<h2>Thank you for your order</h2>';
+  });
+</script>
+</html>

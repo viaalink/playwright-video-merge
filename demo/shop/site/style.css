@@ -1,0 +1,15 @@
+* { box-sizing: border-box; }
+body { margin: 0; font: 20px/1.4 system-ui, sans-serif; background: #f6f3ee; color: #1d1b18; }
+header { display: flex; align-items: center; gap: 24px; padding: 20px 48px; background: #1d1b18; color: #f6f3ee; }
+header h1 { margin: 0; font-size: 28px; flex: 1; }
+header a { color: #ffcf6e; text-decoration: none; font-weight: 600; }
+main { padding: 40px 48px; }
+input { font: inherit; padding: 10px 14px; border: 2px solid #c9c2b6; border-radius: 10px; width: 420px; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 28px; }
+article { background: #fff; border-radius: 16px; padding: 28px; box-shadow: 0 2px 10px #0001; }
+article .pic { height: 150px; border-radius: 12px; margin-bottom: 16px; }
+button { font: inherit; font-weight: 600; padding: 10px 18px; border: 0; border-radius: 10px; background: #e2603a; color: #fff; cursor: pointer; }
+ul { list-style: none; padding: 0; }
+li { background: #fff; border-radius: 12px; padding: 14px 18px; margin: 10px 0; width: fit-content; }
+li b { color: #e2603a; }
+.hidden { display: none; }

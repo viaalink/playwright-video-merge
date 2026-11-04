@@ -11,6 +11,8 @@
   expansion off, so quotes, colons, `%`, backslashes and `%{...}` in a test title appear
   literally.
 - **Playable MP4 everywhere:** `-f mp4` writes `yuv420p` with `+faststart`.
+- **About 7× faster WebM.** VP8 is encoded with `-deadline realtime -cpu-used 8`: four 1280×720
+  recordings (36 s) merge in 7.5 s instead of 55 s with 0.2.0, at about the same size.
 
 ### Other
 

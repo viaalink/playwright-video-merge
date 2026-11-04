@@ -34,5 +34,5 @@ export function quoteFilterValue(value: string): string {
 export function codecArgs(format: 'webm' | 'mp4'): string[] {
   return format === 'mp4'
     ? ['-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an']
-    : ['-c:v', 'libvpx', '-b:v', '2M', '-an'];
+    : ['-c:v', 'libvpx', '-b:v', '2M', '-deadline', 'realtime', '-cpu-used', '8', '-an'];
 }

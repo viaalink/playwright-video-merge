@@ -1,15 +1,16 @@
-import ffmpeg from 'fluent-ffmpeg';
 import { join } from 'node:path';
+import { writeFile, unlink } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { randomBytes } from 'node:crypto';
 import { resolveFont } from './font-resolver.js';
+import { runFfmpeg, quoteFilterValue, codecArgs } from './run-ffmpeg.js';
 import type { MergeOptions } from './types.js';
 
 /**
  * Add a text overlay to a video showing the test name.
  * Returns the path to the processed video in a temp directory.
  */
-export function addOverlay(
+export async function addOverlay(
   inputPath: string,
   displayName: string,
   options: Pick<MergeOptions, 'overlayDuration' | 'font' | 'fontSize' | 'fontColor' | 'boxColor' | 'format'>
@@ -24,31 +25,30 @@ export function addOverlay(
   const outputPath = join(tmpdir(), `pvmerge-${randomBytes(8).toString('hex')}${ext}`);
 
   const fontOpt = resolveFont(options.font);
-  // Escape special characters in display name for ffmpeg drawtext
-  const escapedName = displayName
-    .replace(/\\/g, '\\\\')
-    .replace(/'/g, "'\\''")
-    .replace(/:/g, '\\:')
-    .replace(/%/g, '%%');
+  // The name goes through a text file, so no character in a test title needs escaping.
+  const textFile = join(tmpdir(), `pvmerge-${randomBytes(8).toString('hex')}.txt`);
+  await writeFile(textFile, displayName, 'utf8');
 
-  const filterOpts: Record<string, string | number> = {
-    [fontOpt.key]: fontOpt.value,
-    text: escapedName,
-    fontsize: fontSize,
-    fontcolor: fontColor,
-    x: '(w-text_w)/2',
-    y: 'h-50',
-    box: 1,
-    boxcolor: boxColor,
-    boxborderw: 5,
-    enable: `between(t,0,${duration})`,
-  };
+  const drawtext = [
+    `${fontOpt.key}=${quoteFilterValue(fontOpt.value)}`,
+    `textfile=${quoteFilterValue(textFile)}`,
+    'expansion=none',
+    `fontsize=${fontSize}`,
+    `fontcolor=${quoteFilterValue(fontColor)}`,
+    `x=(w-text_w)/2`,
+    `y=h-50`,
+    `box=1`,
+    `boxcolor=${quoteFilterValue(boxColor)}`,
+    `boxborderw=5`,
+    `enable=${quoteFilterValue(`between(t,0,${duration})`)}`,
+  ].join(':');
 
-  return new Promise((resolve, reject) => {
-    ffmpeg(inputPath)
-      .videoFilters([{ filter: 'drawtext', options: filterOpts }])
-      .on('end', () => resolve(outputPath))
-      .on('error', (err: Error) => reject(new Error(`Overlay failed for "${displayName}": ${err.message}`)))
-      .save(outputPath);
-  });
+  try {
+    await runFfmpeg(['-i', inputPath, '-vf', `drawtext=${drawtext}`, ...codecArgs(format), outputPath]);
+  } catch (err) {
+    throw new Error(`Overlay failed for "${displayName}": ${err instanceof Error ? err.message : err}`);
+  } finally {
+    await unlink(textFile).catch(() => {});
+  }
+  return outputPath;
 }

@@ -1,12 +1,11 @@
-import ffmpeg from 'fluent-ffmpeg';
 import { resolve as resolvePath, dirname } from 'node:path';
 import { mkdir } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
 import { findVideos } from './video-finder.js';
 import { parseReport, enrichVideosWithReport } from './report-parser.js';
 import { addOverlay } from './overlay.js';
 import { cleanupFiles } from './cleanup.js';
 import { requireFfmpeg } from './ffmpeg-check.js';
+import { runFfmpeg, codecArgs } from './run-ffmpeg.js';
 import type { MergeOptions, MergeResult, FoundVideo, ProgressEvent } from './types.js';
 
 const DEFAULTS: Required<Omit<MergeOptions, 'reportPath' | 'onProgress'>> = {
@@ -59,22 +58,16 @@ export function overlayLabel(video: FoundVideo): string {
   return video.partCount ? `${video.displayName} (${video.part}/${video.partCount})` : video.displayName;
 }
 
-function mergeVideoFiles(inputPaths: string[], outputPath: string, format: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const command = ffmpeg();
-    for (const p of inputPaths) {
-      command.input(p);
-    }
-
-    if (format === 'mp4') {
-      command.outputOptions(['-c:v', 'libx264', '-c:a', 'aac']);
-    }
-
-    command
-      .on('end', () => resolve())
-      .on('error', (err: Error) => reject(new Error(`Merge failed: ${err.message}`)))
-      .mergeToFile(outputPath, tmpdir());
-  });
+async function mergeVideoFiles(inputPaths: string[], outputPath: string, format: 'webm' | 'mp4'): Promise<void> {
+  // The concat filter re-encodes, so recordings with different codecs or timestamps still join cleanly.
+  const inputs = inputPaths.flatMap((p) => ['-i', p]);
+  const streams = inputPaths.map((_, i) => `[${i}:v:0]`).join('');
+  const filter = `${streams}concat=n=${inputPaths.length}:v=1:a=0[v]`;
+  try {
+    await runFfmpeg([...inputs, '-filter_complex', filter, '-map', '[v]', ...codecArgs(format), outputPath]);
+  } catch (err) {
+    throw new Error(`Merge failed: ${err instanceof Error ? err.message : err}`);
+  }
 }
 
 export async function merge(userOptions: MergeOptions = {}): Promise<MergeResult> {

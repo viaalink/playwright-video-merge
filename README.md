@@ -5,6 +5,9 @@ Maintained by [Viaalink](https://viaalink.com).
 
 Turn your E2E test recordings into a "what the system can do" demo video — automatically.
 
+**See it in action:** [Our payment tests, as one video](https://youtu.be/ktt4sj2jYaw) (1:45):
+viaalink.com's own Playwright payment tests against Mollie's test mode, merged into one video.
+
 > Formerly `@accelerated-software-development/playwright-video-merge`. Same CLI and API:
 > replace the package name in your `package.json` and imports. The old name is deprecated
 > and its last version (0.1.1) only re-exports this package.

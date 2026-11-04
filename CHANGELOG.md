@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.2.1](https://github.com/viaalink/playwright-video-merge/compare/v0.2.0...v0.2.1) (2026-11-04)
+
+### Bug Fixes
+
+- **No more deprecation warning on install.** `fluent-ffmpeg` is no longer supported upstream
+  and npm warned about it on every install. The tool now calls `ffmpeg` directly; the only
+  runtime dependency left is `commander`.
+- **Test names are drawn exactly as written.** The overlay text is read from a file with
+  expansion off, so quotes, colons, `%`, backslashes and `%{...}` in a test title appear
+  literally.
+- **Playable MP4 everywhere:** `-f mp4` writes `yuv420p` with `+faststart`.
+
+### Other
+
+- First release through npm trusted publishing (GitHub Actions, `release.yml`).
+
 ## [0.2.0](https://github.com/viaalink/playwright-video-merge/compare/v0.1.0...v0.2.0) (2026-11-04)
 
 The package is now `@viaalink/playwright-video-merge`, maintained by

@@ -96,6 +96,17 @@ describe.skipIf(!hasFfmpeg)('mergePlaywrightVideos (integration)', () => {
     }
   }, 60000);
 
+  it('draws any test title, quotes, colons, percent signs and backslashes included', async () => {
+    const { addOverlay } = await import('../../src/overlay.js');
+    const input = join(FIXTURES, 'test-results', 'should-load-widgets-chromium', 'video.webm');
+    const out = await addOverlay(input, `it's 100% "done": C:\\path \\n %{pts} {x}`, { overlayDuration: 1, format: 'mp4' });
+    try {
+      expect(existsSync(out)).toBe(true);
+    } finally {
+      if (existsSync(out)) unlinkSync(out);
+    }
+  }, 60000);
+
   it('should throw for empty directory', async () => {
     await expect(
       mergePlaywrightVideos({

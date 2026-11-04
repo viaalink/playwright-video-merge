@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>merged-demo.webm</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0d1117; color: #9da7b3; font: 15px ui-monospace, monospace; }
+  .wrap { height: 100%; box-sizing: border-box; padding: 58px 0 150px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  video { height: 100%; max-width: 92%; border-radius: 10px; box-shadow: 0 10px 40px #000a; background: #000; }
+</style>
+<div class="wrap">
+  <div id="name"></div>
+  <video muted playsinline></video>
+</div>
+<script>
+  const src = new URLSearchParams(location.search).get('src');
+  document.getElementById('name').textContent = src.split('/').pop();
+  document.querySelector('video').src = src;
+</script>
+</html>

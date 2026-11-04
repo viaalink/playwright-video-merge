@@ -1,0 +1,13 @@
+{
+  "name": "acme-shop-e2e",
+  "private": true,
+  "description": "The shop the demo film tests. Its own package, installed by demo/global-setup.ts.",
+  "scripts": {
+    "test": "playwright test",
+    "reel": "playwright-video-merge --report playwright-report.json --sort report-order"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1",
+    "@viaalink/playwright-video-merge": "^0.2.0"
+  }
+}

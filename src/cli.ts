@@ -1,11 +1,18 @@
 #!/usr/bin/env node
 import { readFileSync } from 'node:fs';
+import { relative, isAbsolute } from 'node:path';
 import { Command } from 'commander';
 import { merge } from './merger.js';
 import { checkFfmpeg } from './ffmpeg-check.js';
 import type { MergeOptions } from './types.js';
 
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+
+/** A path under the current directory is shown relative to it, so the output stays short. */
+function shown(path: string): string {
+  const rel = relative(process.cwd(), path);
+  return rel && !rel.startsWith('..') && !isAbsolute(rel) ? rel : path;
+}
 
 const program = new Command();
 
@@ -53,7 +60,7 @@ program
       noOverlay: !opts.overlay,
       cleanup: opts.cleanup,
       onProgress: (event) => {
-        if (opts.verbose || event.stage === 'done') {
+        if (opts.verbose) {
           const progress = event.current && event.total
             ? ` [${event.current}/${event.total}]`
             : '';
@@ -68,7 +75,7 @@ program
 
     try {
       const result = await merge(options);
-      console.log(`Done! Merged ${result.videoCount} videos → ${result.outputPath}`);
+      console.log(`Done! Merged ${result.videoCount} videos → ${shown(result.outputPath)}`);
     } catch (err) {
       console.error(`Error: ${err instanceof Error ? err.message : err}`);
       process.exit(1);

@@ -1,12 +1,29 @@
-# @accelerated-software-development/playwright-video-merge
+# @viaalink/playwright-video-merge
 
 Merge Playwright test result videos into a single demo reel with test name overlays.
+Maintained by [Viaalink](https://viaalink.com).
 
 Turn your E2E test recordings into a "what the system can do" demo video — automatically.
 
+> Formerly `@accelerated-software-development/playwright-video-merge`. Same CLI and API:
+> replace the package name in your `package.json` and imports. The old name is deprecated
+> and its last version (0.1.1) only re-exports this package.
+
+## What ends up in the reel
+
+- **Every recording.** The `page` fixture's `video.webm` (and `video-1.webm`, ... for more
+  pages), and the hash-named `.webm` files of contexts a test records itself with
+  `recordVideo`. A test with several recordings shows them in recording order as
+  `title (1/2)`, `title (2/2)`.
+- **Real test names** with `--report`: describe blocks and title, e.g.
+  `Checkout > adds an item to the cart`. Videos are matched through the report's video
+  attachments, so shortened folder names (`...-18022-...`) and retries (`(retry1)`) are named
+  correctly too.
+- **Your test order** with `--sort report-order`: file by file, in declaration order.
+
 ## Requirements
 
-- **Node.js** >= 18
+- **Node.js** >= 20
 - **ffmpeg** installed and in PATH
 
 ```bash
@@ -23,7 +40,7 @@ choco install ffmpeg
 ## Installation
 
 ```bash
-npm install -D @accelerated-software-development/playwright-video-merge
+npm install -D @viaalink/playwright-video-merge
 ```
 
 ## Playwright Video Configuration
@@ -66,7 +83,7 @@ npx playwright-video-merge --no-overlay
 ```
 -i, --input <dir>          Input directory (default: ./test-results)
 -o, --output <file>        Output file (default: ./merged-demo.webm)
--r, --report <file>        playwright-report.json for test names
+-r, --report <file>        JSON report (Playwright's json reporter) for test names
 -f, --format <format>      Output format: webm or mp4 (default: webm)
 -d, --overlay-duration <s> Overlay duration in seconds (default: 5)
 --font <name>              Font name or .ttf path (default: DejaVu Sans)
@@ -74,6 +91,7 @@ npx playwright-video-merge --no-overlay
 --font-color <color>       Font color (default: white)
 --box-color <color>        Background box color (default: black@0.5)
 --sort <strategy>          alphabetical | report-order | mtime (default: alphabetical)
+                           report-order needs --report
 --no-overlay               Skip overlay, just concatenate
 --no-cleanup               Keep intermediate files
 -v, --verbose              Verbose output
@@ -82,7 +100,7 @@ npx playwright-video-merge --no-overlay
 ## Programmatic API
 
 ```typescript
-import { mergePlaywrightVideos } from '@accelerated-software-development/playwright-video-merge';
+import { mergePlaywrightVideos } from '@viaalink/playwright-video-merge';
 
 const result = await mergePlaywrightVideos({
   inputDir: './test-results',
@@ -106,7 +124,7 @@ console.log(`Merged ${result.videoCount} videos → ${result.outputPath}`);
 ### Check ffmpeg availability
 
 ```typescript
-import { checkFfmpeg } from '@accelerated-software-development/playwright-video-merge';
+import { checkFfmpeg } from '@viaalink/playwright-video-merge';
 
 const info = checkFfmpeg();
 if (!info.available) {
@@ -131,6 +149,19 @@ Then run after tests:
 ```bash
 npx playwright test
 npm run merge-videos
+```
+
+## Example
+
+[`tests/fixtures/playwright-1.58`](tests/fixtures/playwright-1.58) is the real output of
+Playwright 1.58 for [`app.spec.ts`](tests/fixtures/playwright-1.58/app.spec.ts): a describe
+block, a title Playwright shortens, a test with two browser contexts and a top-level test.
+
+```bash
+npx playwright-video-merge \
+  -i tests/fixtures/playwright-1.58/test-results \
+  -r tests/fixtures/playwright-1.58/playwright-report.json \
+  --sort report-order -o reel.mp4 -f mp4
 ```
 
 ## License

@@ -3,3 +3,6 @@ tests/
 tsconfig.json
 tsup.config.ts
 .github/
+legacy-package/
+justfile
+vitest.config.ts

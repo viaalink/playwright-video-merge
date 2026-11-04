@@ -1,0 +1,53 @@
+{
+  "name": "@accelerated-software-development/playwright-video-merge",
+  "version": "0.1.1",
+  "description": "Moved to @viaalink/playwright-video-merge. This package only re-exports it.",
+  "type": "module",
+  "main": "./index.cjs",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./index.d.ts",
+        "default": "./index.js"
+      },
+      "require": {
+        "types": "./index.d.cts",
+        "default": "./index.cjs"
+      }
+    }
+  },
+  "bin": {
+    "playwright-video-merge": "cli.js"
+  },
+  "files": [
+    "index.js",
+    "index.cjs",
+    "index.d.ts",
+    "index.d.cts",
+    "cli.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "@viaalink/playwright-video-merge": "^0.2.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "author": "Viaalink <info@viaalink.com> (https://viaalink.com)",
+  "license": "MIT",
+  "homepage": "https://www.npmjs.com/package/@viaalink/playwright-video-merge",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/viaalink/playwright-video-merge.git",
+    "directory": "legacy-package"
+  },
+  "bugs": {
+    "url": "https://github.com/viaalink/playwright-video-merge/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
